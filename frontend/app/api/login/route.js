@@ -24,6 +24,7 @@ export async function POST(request) {
           const accessToken = jwt.sign({ email: row[0].email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
           const refreshToken = jwt.sign({ email: row[0].email }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
           console.log(`User logged in with email: ${email}`);
+          await db.execute('UPDATE users SET refreshToken = ? WHERE email = ?', [refreshToken,email]);
           const accessCookie = serialize('accessToken', accessToken, {
             httpOnly: true,
             secure: true,
@@ -38,7 +39,7 @@ export async function POST(request) {
             maxAge: 60 * 60 * 24 * 7,
             sameSite: 'strict',
           });
-          return new Response(JSON.stringify({ message: 'Login successful', name: row.name }), {
+          return new Response(JSON.stringify({ message: 'Login successful', name: row[0].name }), {
             status: 200,
             headers: { 'Content-Type': 'application/json', 'Set-Cookie': [accessCookie,refreshCookie] },
           });

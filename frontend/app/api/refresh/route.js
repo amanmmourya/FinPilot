@@ -17,6 +17,8 @@ export async function POST(request) {
         // Generate a new access token
         const newAccessToken = jwt.sign({ email: userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
         const newRefreshToken = jwt.sign({ email: userEmail }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+        await db.execute('UPDATE users SET refreshToken = ? WHERE email = ?', [newRefreshToken,email]);
+
         const serialized = serialize('refreshToken', newRefreshToken, {
             httpOnly: true,
             secure: true,
@@ -24,6 +26,8 @@ export async function POST(request) {
             maxAge: 60 * 60 * 24 * 7,
             sameSite: 'strict',
         });
+        await db.execute('UPDATE users SET refreshToken = ? WHERE email = ?', [refreshToken,email]);
+
         return new Response(JSON.stringify({ accessToken: newAccessToken }), {
             status: 200,
             headers: { 'Content-Type': 'application/json', 'Set-Cookie': serialized },

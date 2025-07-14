@@ -1,9 +1,16 @@
 "use client"
-import React from 'react'
+import React, { useState } from 'react'
+import CreateAccount from '../../components/createAccount.js';
+import Interactive from '@/components/interactiveCharts.js';
+import { Inter } from 'next/font/google/index.js';
+import Transactions from '@/components/transactions.js';
 
 const DashBoard = () => {
     const [selectedMonth, setSelectedMonth] = React.useState({ month: new Date().getMonth(), year: new Date().getFullYear() });
-
+    const handleCreateAccount = () => {
+        setShow(true);
+    }
+    const [show,setShow]=useState(false);
     const months = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
@@ -13,6 +20,7 @@ const DashBoard = () => {
 
     return (
         <div>
+            {show? <CreateAccount show={show} setShow={setShow} /> : null}
             <div className="flex flex-col md:flex-row items-center md:items-center justify-between bg-blue-700 px-4 md:px-6 py-3 text-white gap-4 md:gap-0">
                 <div className="font-bold text-xl mr-0 md:mr-8 mb-2 md:mb-0">FinPilot</div>
                 <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 flex-1 md:justify-center w-full md:w-auto">
@@ -43,7 +51,7 @@ const DashBoard = () => {
                     </div>
                 </div>
                 <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 mt-2 md:mt-0">
-                    <button className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:from-green-600 hover:to-green-800 text-white px-6 py-2 rounded-lg shadow-lg font-semibold transition duration-200 ease-in-out w-full md:w-auto flex items-center gap-2 border border-green-400 hover:scale-105 active:scale-95">
+                    <button onClick={handleCreateAccount} className="bg-gradient-to-r from-green-500 via-green-600 to-green-700 hover:from-green-600 hover:to-green-800 text-white px-6 py-2 rounded-lg shadow-lg font-semibold transition duration-200 ease-in-out w-full md:w-auto flex items-center gap-2 border border-green-400 hover:scale-105 active:scale-95">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                         </svg>
@@ -56,23 +64,12 @@ const DashBoard = () => {
             </div>
             <h1 className="mt-8 text-2xl font-bold px-4 md:px-0">Dashboard</h1>
             <div className='visual'>
-                <div className='charts'></div>
+                <Interactive />
                 <div className='categories'></div>
             </div>
-            <h1 className='mt-8 text-2xl font-bold px-4 md:px-0'>Overview</h1>
-            <div>
-                <div className='overview-cards'>
-                    <div className='card'>Total Income</div>
-                    <div className='card'>Total Expenses</div>
-                    <div className='card'>Net Savings</div>
-                </div>
-            </div>
+            
             <h1 className='mt-8 text-2xl font-bold px-4 md:px-0'>Transactions</h1>
-            <div className='transactions'>
-                <div className='transaction'>Transaction 1</div>
-                <div className='transaction'>Transaction 2</div>
-                <div className='transaction'>Transaction 3</div>
-            </div>
+            <Transactions />
 
         </div>
     )
