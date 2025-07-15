@@ -1,33 +1,61 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CreateAccount from '../../components/createAccount.js';
 import Interactive from '@/components/interactiveCharts.js';
 import { Inter } from 'next/font/google/index.js';
 import Transactions from '@/components/transactions.js';
+import { useSelector } from 'react-redux';
 
 const DashBoard = () => {
+    const transactions = useSelector((state) => state.allTransactions.transactionsArray);
+    const accounts = useSelector((state) => state.allAccounts.accountsArray);
+    console.log('Accounts:', accounts);
+    console.log('Transactions:', transactions);
     const [selectedMonth, setSelectedMonth] = React.useState({ month: new Date().getMonth(), year: new Date().getFullYear() });
     const handleCreateAccount = () => {
         setShow(true);
     }
-    const [show,setShow]=useState(false);
+    const [currentAccount, setCurrentAccount] = useState(accounts.length > 0 ? accounts[0].acc_name : "");
+    console.log('Current Account:', currentAccount);
+    const filterByMonth = (transactions, monthNumber, year) => {
+        const fromDate = new Date(Date.UTC(year, monthNumber, 1)); // 1st of month
+        const toDate = new Date(Date.UTC(year, monthNumber+1, 0, 23, 59, 59, 999)); // last day of month at 23:59:59.999
+
+        return transactions.filter(tx => {
+            const txDate = new Date(tx.timestamp); // already in UTC
+            return txDate >= fromDate && txDate <= toDate && tx.account == currentAccount;
+        });
+    };
     const months = [
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
+    const currentMonth = selectedMonth.month;
+    const currentYear = selectedMonth.year;
+    console.log('Current Month:', currentMonth, 'Current Year:', currentYear);
+    const [filteredTransactions,setFilteredTransactions] = useState(filterByMonth(transactions, selectedMonth.month, selectedMonth.year))
+    console.log('Filtered Transactions:', filteredTransactions);
+    const [show, setShow] = useState(false);
 
     const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i);
-
+    useEffect(() => {
+        setFilteredTransactions(filterByMonth(transactions, selectedMonth.month, selectedMonth.year));
+    }
+    , [selectedMonth, transactions, currentAccount]);
     return (
         <div>
-            {show? <CreateAccount show={show} setShow={setShow} /> : null}
+            {show ? <CreateAccount show={show} setShow={setShow} /> : null}
             <div className="flex flex-col md:flex-row items-center md:items-center justify-between bg-blue-700 px-4 md:px-6 py-3 text-white gap-4 md:gap-0">
                 <div className="font-bold text-xl mr-0 md:mr-8 mb-2 md:mb-0">FinPilot</div>
                 <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 flex-1 md:justify-center w-full md:w-auto">
-                    <select className="bg-blue-800 md:bg-gradient-to-r md:from-blue-800 md:via-blue-700 md:to-blue-900 text-white border border-blue-400 px-3 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200 w-full md:w-auto hover:bg-blue-800">
-                        <option>Account 1</option>
-                        <option>Account 2</option>
-                        <option>Account 3</option>
+                    <select
+                        className="bg-blue-800 md:bg-gradient-to-r md:from-blue-800 md:via-blue-700 md:to-blue-900 text-white border border-blue-400 px-3 py-2 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200 w-full md:w-auto hover:bg-blue-800"
+                        value={currentAccount}
+                        onChange={e => setCurrentAccount(e.target.value)}
+                    >
+                        {accounts.map((account, index) => (
+                            <option key={index} value={account.acc_name}>{account.acc_name}</option>
+                        ))}
                     </select>
                     <div className="flex gap-2 items-center">
                         <select
@@ -62,14 +90,14 @@ const DashBoard = () => {
                     </div>
                 </div>
             </div>
-            <h1 className="mt-8 text-2xl font-bold px-4 md:px-0">Dashboard</h1>
+            <h1 className="mt-8 text-2xl font-bold px-4 md:px-0 text-center">Dashboard</h1>
             <div className='visual'>
-                <Interactive />
+                <Interactive filteredTransactions={filteredTransactions} />
                 <div className='categories'></div>
             </div>
-            
-            <h1 className='mt-8 text-2xl font-bold px-4 md:px-0'>Transactions</h1>
-            <Transactions />
+
+            <h1 className='mt-8 text-2xl font-bold px-4 md:px-0 text-center'>Transactions</h1>
+            <Transactions filteredTransactions={filteredTransactions} currentAccount={currentAccount} />
 
         </div>
     )
