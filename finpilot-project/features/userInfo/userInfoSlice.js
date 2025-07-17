@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     username: "",
     email: "",
+    limit: null,
 }
 const userInfoSlice = createSlice({
     name: "userInfo",
@@ -11,8 +12,11 @@ const userInfoSlice = createSlice({
             console.log('Setting user info:', action.payload);
             state.username= action.payload.username;
             state.email= action.payload.email;
+        },
+        setLimit: (state, action) => {
+            state.limit = action.payload;
         }
     }
 })
-export const { setUser} = userInfoSlice.actions;
+export const { setUser,setLimit} = userInfoSlice.actions;
 export default userInfoSlice.reducer;

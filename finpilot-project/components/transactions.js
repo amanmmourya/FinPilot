@@ -3,7 +3,8 @@ import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 // id title category amount date
-const Transactions = ({ filteredTransactions,currentAccount }) => {
+const Transactions = ({ filteredTransactions,currentAccount,currentLimit }) => {
+    const totalExpense= filteredTransactions.reduce((acc, tx) => acc + Number((tx.type == 'expense' ? tx.amount : 0)), 0);
     const email= useSelector((state) => state.userInfo.email);
     const [transactions, setTransactions] = useState(filteredTransactions.map(tx => ({
         id: tx.id,
@@ -100,6 +101,21 @@ const Transactions = ({ filteredTransactions,currentAccount }) => {
             },
         ]);
         alert('Transaction added successfully');
+        if(totalExpense+ Number(form.amount) > currentLimit && currentLimit > 0){
+            const mailData=await fetch('/api/sendLimitMail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_email: email,
+                    currentAccount: currentAccount,
+                    totalExpense: totalExpense + Number(form.amount),
+                    currentLimit: currentLimit,
+                }),
+            });
+        }
+        console.log(totalExpense+ Number(form.amount), currentLimit);
         setForm({ title: '', category: 'none',type:'income', amount: '', date: '' });
         setShowModal(false);
     };
