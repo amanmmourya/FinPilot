@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import OCRPage from './ocrPage';
 // id title category amount date
 const Transactions = ({ filteredTransactions,currentAccount,currentLimit }) => {
     const totalExpense= filteredTransactions.reduce((acc, tx) => acc + Number((tx.type == 'expense' ? tx.amount : 0)), 0);
@@ -132,104 +133,108 @@ const Transactions = ({ filteredTransactions,currentAccount,currentLimit }) => {
                 Add Transaction
             </button>
             {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl p-4 sm:p-8 shadow-2xl w-full max-w-lg relative border border-[#eaf3ff] mx-2">
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+                    <div className="bg-white rounded-2xl p-2 sm:p-6 shadow-2xl w-full max-w-lg relative border border-[#eaf3ff] mx-2 max-h-[95vh] flex flex-col overflow-y-auto" style={{ minHeight: '0' }}>
                         <button
-                            className="absolute top-3 right-3 text-[#e23d3d] font-bold text-2xl hover:text-red-700 transition"
+                            className="absolute top-2 right-2 text-[#e23d3d] font-bold text-2xl hover:text-red-700 transition"
                             onClick={() => setShowModal(false)}
                             title="Close"
+                            tabIndex={0}
                         >
                             &times;
                         </button>
-                        <h2 className="text-2xl font-bold text-[#1a4fa3] mb-6 text-center">Add New Transaction</h2>
-                        <form onSubmit={handleAddTransaction} className="flex flex-col gap-2">
-                            <div>
-                                <label className="block text-[#1a4fa3] font-semibold mb-1">Title</label>
-                                <input
-                                    type="text"
-                                    name="title"
-                                    value={form.title}
-                                    onChange={handleInputChange}
-                                    className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition"
-                                    required
-                                    placeholder="e.g. Grocery Shopping"
-                                />
-                            </div>
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <div className="flex-1">
-                                    <label className="block text-[#1a4fa3] font-semibold mb-1">Type</label>
-                                    <select
-                                        name="type"
-                                        value={form.type}
-                                        onChange={handleInputChange}
-                                        className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition"
-                                    >
-                                        <option value="income">Income</option>
-                                        <option value="expense">Expense</option>
-                                    </select>
-                                </div>
-                                <div className="flex-1">
-                                    <label className="block text-[#1a4fa3] font-semibold mb-1">Category</label>
-                                    <select
-                                        name="category"
-                                        value={form.category}
+                        <h2 className="text-xl sm:text-2xl font-bold text-[#1a4fa3] mb-2 text-center">Add New Transaction</h2>
+                        <div className="overflow-y-auto flex-1 w-full" style={{ maxHeight: '80vh', minHeight: '0' }}>
+                            <OCRPage setForm={setForm}/>
+                            <form onSubmit={handleAddTransaction} className="flex flex-col gap-2 w-full">
+                                <div>
+                                    <label className="block text-[#1a4fa3] font-semibold mb-1">Title</label>
+                                    <input
+                                        type="text"
+                                        name="title"
+                                        value={form.title}
                                         onChange={handleInputChange}
                                         className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition"
                                         required
-                                    >
-                                        <option value="none">Select Category</option>
-                                        <option value="rents">Rents</option>
-                                        <option value="food">Food</option>
-                                        <option value="transport">Travel</option>
-                                        <option value="shopping">Shopping</option>
-                                        <option value="study">Study</option>
-                                        <option value="tech">Tech</option>
-                                        <option value="education">Education</option>
-                                    </select>
+                                        placeholder="e.g. Grocery Shopping"
+                                    />
                                 </div>
-                            </div>
-                            <div>
-                                <label className="block text-[#1a4fa3] font-semibold mb-1">Amount</label>
-                                <input
-                                    type="number"
-                                    name="amount"
-                                    value={form.amount}
-                                    onChange={handleInputChange}
-                                    className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition"
-                                    required
-                                    min="0"
-                                    placeholder="e.g. 100"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[#1a4fa3] font-semibold mb-1">Date</label>
-                                <input
-                                    type="date"
-                                    name="date"
-                                    value={form.date}
-                                    onChange={handleInputChange}
-                                    className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[#1a4fa3] font-semibold mb-1">Description</label>
-                                <textarea
-                                    name="description"
-                                    value={form.description}
-                                    onChange={handleInputChange}
-                                    className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition resize-none"
-                                    rows={3}
-                                    placeholder="Add details (optional)"
-                                />
-                            </div>
-                            <button
-                                type="submit"
-                                className="bg-[#1bb76e] hover:bg-[#159e5c] transition-colors text-white px-6 py-2 rounded-lg font-semibold mt-2 shadow-md"
-                            >
-                                Add Transaction
-                            </button>
-                        </form>
+                                <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 w-full">
+                                    <div className="flex-1 min-w-0">
+                                        <label className="block text-[#1a4fa3] font-semibold mb-1">Type</label>
+                                        <select
+                                            name="type"
+                                            value={form.type}
+                                            onChange={handleInputChange}
+                                            className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition"
+                                        >
+                                            <option value="income">Income</option>
+                                            <option value="expense">Expense</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <label className="block text-[#1a4fa3] font-semibold mb-1">Category</label>
+                                        <select
+                                            name="category"
+                                            value={form.category}
+                                            onChange={handleInputChange}
+                                            className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition"
+                                            required
+                                        >
+                                            <option value="none">Select Category</option>
+                                            <option value="rents">Rents</option>
+                                            <option value="food">Food</option>
+                                            <option value="transport">Travel</option>
+                                            <option value="shopping">Shopping</option>
+                                            <option value="study">Study</option>
+                                            <option value="tech">Tech</option>
+                                            <option value="education">Education</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-[#1a4fa3] font-semibold mb-1">Amount</label>
+                                    <input
+                                        type="number"
+                                        name="amount"
+                                        value={form.amount}
+                                        onChange={handleInputChange}
+                                        className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition"
+                                        required
+                                        min="0"
+                                        placeholder="e.g. 100"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[#1a4fa3] font-semibold mb-1">Date</label>
+                                    <input
+                                        type="date"
+                                        name="date"
+                                        value={form.date}
+                                        onChange={handleInputChange}
+                                        className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[#1a4fa3] font-semibold mb-1">Description</label>
+                                    <textarea
+                                        name="description"
+                                        value={form.description}
+                                        onChange={handleInputChange}
+                                        className="w-full border border-[#c7dbf7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1a4fa3] transition resize-none"
+                                        rows={3}
+                                        placeholder="Add details (optional)"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="bg-[#1bb76e] hover:bg-[#159e5c] transition-colors text-white px-6 py-2 rounded-lg font-semibold mt-2 shadow-md"
+                                >
+                                    Add Transaction
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
